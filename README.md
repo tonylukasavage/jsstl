@@ -19,3 +19,8 @@ license
 -------
 
 Do whatever you want with this code. I offer it without expectation or warranty. No need to credit me in your project or source code. A [digital high five](https://twitter.com/tonylukasavage) would be nice, but is not required.
+
+me
+-----
+
+**[@tonylukasavage](https://twitter.com/tonylukasavage)**
