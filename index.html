@@ -14,9 +14,78 @@
         </style>
     </head>
     <body>
+    	<!-- File Picker -->
+    	<input type="file" id="files" name="files[]" accept=".stl" style="margin-top:50px;"/>
+		<output id="list"></output>
+    
         <script src="three.js"></script>
         <script src="stats.js"></script>
         <script src="detector.js"></script>
+
+		<!-- STL File Parsing -->	
+		<script>
+			function handleFileSelect(evt) {
+			var file = evt.target.files[0]; // FileList object
+			
+			console.log('File opened: '+file.name);
+			
+			//Determine the file's type with the 'typeReader' then parse
+			//	as binary or ASCII accordingly
+			var typeReader = new FileReader();
+			
+			// Closure to capture the file information.
+			typeReader.onload = (function(theFile) {
+				return function(e) {
+					// Render thumbnail.
+					console.log('Loaded first 80 bytes of '+theFile.name);
+					if(e.target.result === 'solid') {
+						console.log('File is ASCII');
+						readAsASCII(theFile);
+					} else {
+						console.log('File is binary');
+						readAsBinary(theFile);
+					}
+				};
+			})(file);		
+			// Read in the STL file as binary data for the first 5 bytes.
+			//	in ASCII the first portion should be the string 'solid'
+			var blob = file.slice(0,5);
+			typeReader.readAsBinaryString(blob);		    
+			}
+			
+			function readAsASCII(file) {
+			console.log(file);
+			var reader = new FileReader();
+			
+			reader.onload = (function(theFile) {
+				return function(e){
+					parseStlASCII(e.target.result);
+					mesh.rotation.x=5;
+					mesh.rotation.z=.25;
+				};
+			})(file);
+			
+			reader.readAsText(file);		  		
+			}
+			
+			function readAsBinary(file) {
+			console.log(file);
+			var reader = new FileReader();
+			
+			reader.onload=(function(theFile) {
+				return function(e){
+					parseStlBinary(e.target.result);
+					mesh.rotation.x=5;
+					mesh.rotation.z=.25
+				};
+			})(file);
+			
+			reader.readAsArrayBuffer(file);		  		
+			}
+			
+			
+			document.getElementById('files').addEventListener('change', handleFileSelect, false);
+		</script>
         <script>
 
             var camera, scene, renderer,
@@ -99,7 +168,7 @@
                 stl = null;
             };  
 
-            var parseStl = function(stl) {
+            var parseStlASCII = function(stl) {
                 var state = '';
                 var lines = stl.split('\n');
                 var geo = new THREE.Geometry();
@@ -231,32 +300,7 @@
                 directionalLight.position.z = 1; 
                 directionalLight.position.normalize();
                 scene.add( directionalLight );
-
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function () {
-                    if ( xhr.readyState == 4 ) {
-                        if ( xhr.status == 200 || xhr.status == 0 ) {
-                            var rep = xhr.response; // || xhr.mozResponseArrayBuffer;
-                            console.log(rep);
-                            parseStlBinary(rep);
-                            //parseStl(xhr.responseText);
-                            mesh.rotation.x = 5;
-                            mesh.rotation.z = .25;
-                            console.log('done parsing');
-                        }
-                    }
-                }
-                xhr.onerror = function(e) {
-                    console.log(e);
-                }
                 
-                xhr.open( "GET", 'Octocat-v1.stl', true );
-                xhr.responseType = "arraybuffer";
-                //xhr.setRequestHeader("Accept","text/plain");
-                //xhr.setRequestHeader("Content-Type","text/plain");
-                //xhr.setRequestHeader('charset', 'x-user-defined');
-                xhr.send( null );
-
                 renderer = new THREE.WebGLRenderer(); //new THREE.CanvasRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
 
