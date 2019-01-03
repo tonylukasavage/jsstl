@@ -10,6 +10,8 @@ try it out
 
 Dump this repo on a web server and open up **index.html** in a browser. Voila, [octocat](http://www.thingiverse.com/thing:10367)!
 
+![octocat](https://github.com/tonylukasavage/jsstl/blob/master/octocat.gif)
+
 thanks to
 ---------
 * [three.js](https://github.com/mrdoob/three.js/) for the ability to render the 3D models in WebGL/Canvas via Javascript
